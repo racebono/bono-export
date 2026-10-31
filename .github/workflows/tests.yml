@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+    pull_request:
+        branches: [master]
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: tests-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    test:
+        name: Test
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [windows-latest, ubuntu-latest]
+        runs-on: ${{ matrix.os }}
+        timeout-minutes: 30
+        env:
+            CARGO_TERM_COLOR: always
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  persist-credentials: false
+
+            - name: Set up Rust
+              run: |
+                  rustup toolchain install stable --profile minimal --no-self-update
+                  rustup default stable
+
+            # The benchmark's `bono-sim` generates its bindings with libclang
+            - name: Find libclang
+              if: runner.os == 'Windows'
+              shell: pwsh
+              run: '"LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV'
+
+            - name: Cache Cargo dependencies
+              uses: Swatinem/rust-cache@v2
+              with:
+                  cache-on-failure: true
+                  save-if: ${{ github.ref == 'refs/heads/master' }}
+
+            - name: Run tests
+              run: cargo test --locked
+
+            - name: Build benchmark
+              run: cargo bench --locked --no-run

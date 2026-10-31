@@ -2,6 +2,8 @@
 name = "bono-export"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+repository = "https://github.com/racebono/bono-export"
 publish = false
 
 # Exports a SQLite database into one small, read-only copy, its pages compressed with
@@ -18,7 +20,8 @@ zstd-sys = "2.0.15"
 cc = "1.2"
 
 [dev-dependencies]
-bono-sim = { path = "../sim" }
+# The recorder's schema, to make up a race in for the benchmark
+bono-sim = { git = "https://github.com/racebono/bono", branch = "master" }
 
 # Each step's size and read speed: `cargo bench -p bono-export`, see the file
 [[bench]]
