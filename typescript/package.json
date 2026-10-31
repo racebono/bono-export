@@ -1,0 +1,19 @@
+{
+  "name": "bono-export",
+  "version": "0.1.0",
+  "description": "Read bono SQLite exports over HTTP using TypeScript and WebAssembly",
+  "type": "module",
+  "license": "MIT",
+  "repository": "github:racebono/bono-export",
+  "engines": { "node": ">=22" },
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "LICENSE", "THIRD_PARTY_NOTICES.md"],
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "test:package": "npm run build && node scripts/smoke.mjs",
+    "prepack": "npm run build"
+  },
+  "dependencies": { "@bokuweb/zstd-wasm": "0.0.27", "wa-sqlite": "1.0.0" },
+  "devDependencies": { "@types/node": "^22.0.0", "typescript": "~5.9.3" }
+}

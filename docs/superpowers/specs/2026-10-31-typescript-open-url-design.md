@@ -1,6 +1,6 @@
 # TypeScript `open_url` library
 
-Status: reviewed for planning completeness; awaiting user approval.
+Status: approved by the user; implemented in `typescript/` and reviewed in two Sol rounds.
 
 ## Intent and decisions
 
