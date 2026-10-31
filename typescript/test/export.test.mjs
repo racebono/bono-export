@@ -52,6 +52,7 @@ test('SQL parameters, integer precision, blobs, NULL, unusual column names and e
     await assert.rejects(db.query('SELECT ?', [Number.MAX_SAFE_INTEGER + 1]), /bigint/);
     await assert.rejects(db.query('SELECT ?', [undefined]), /Unsupported/);
     await assert.rejects(db.query('nonsense SQL'), /syntax/i);
+    assert.deepEqual(await db.query('PRAGMA cache_size'), [{ cache_size: -32768 }]);
     assert.deepEqual(await db.query('SELECT 1 AS ok; -- trailing comment'), [{ ok: 1 }]);
     assert.deepEqual(await db.query('SELECT payload FROM telemetry WHERE id < 3').then(rows => rows.map(r => r.payload.length)), [96, 96]);
     const strings = ['', 'a\0b', '\ufeffhello', 'España 🏎️', '☀'.repeat(30000)];
@@ -59,6 +60,15 @@ test('SQL parameters, integer precision, blobs, NULL, unusual column names and e
     assert.deepEqual(await db.query("SELECT CAST(x'610062' AS TEXT) AS text"), [{ text: 'a\0b' }]);
     assert.deepEqual(await db.query('SELECT ? AS bytes, typeof(?) AS kind', [new Uint8Array(), new Uint8Array()]), [{ bytes: new Uint8Array(), kind: 'blob' }]);
   } finally { await db.close(); }
+});
+
+test('supports a configurable SQLite cache and rejects invalid budgets before I/O', async () => {
+  for (const sqliteCacheKiB of [0, 1.5, Infinity, 2147483648]) {
+    await assert.rejects(openUrl('http://test/db', { sqliteCacheKiB, fetch() { throw new Error('must not fetch'); } }), /sqliteCacheKiB/);
+  }
+  const db = await openUrl('http://test/db', { ...rangeTransport(await fixture('small')), sqliteCacheKiB: 512 });
+  try { assert.deepEqual(await db.query('PRAGMA cache_size'), [{ cache_size: -512 }]); }
+  finally { await db.close(); }
 });
 
 test('serializes calls, copies queued parameters, isolates connections and closes idempotently', async () => {

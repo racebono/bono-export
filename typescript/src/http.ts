@@ -9,6 +9,8 @@ export interface OpenOptions {
   cacheBytes?: number;
   /** Decoded page/dictionary cache budget, at least 8 KiB. Default 32 MiB. */
   decodedCacheBytes?: number;
+  /** Page cache for each SQLite instance, in KiB. Default 32768 on Node. */
+  sqliteCacheKiB?: number;
 }
 
 class RequestError extends Error {
@@ -73,7 +75,7 @@ export class RemoteFile {
       }, this.timeout);
     });
     const operation = async () => {
-      response = await this.fetcher(this.url, { headers: {
+      response = await this.fetcher.call(globalThis, this.url, { headers: {
         Range: `bytes=${first}-${last}`, 'Accept-Encoding': 'identity',
       }, signal: controller.signal });
       if (expired) {

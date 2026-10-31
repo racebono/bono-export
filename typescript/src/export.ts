@@ -1,5 +1,6 @@
 import { query, type Row } from './sql.js';
-import type { Engine, createDecoder } from './engines.js';
+import type { Engine } from './engine-common.js';
+import type { Decoder } from './decoder.js';
 import type { ReadableFile } from './vfs.js';
 
 /** One byte-budgeted LRU shared by dictionaries and decoded pages. */
@@ -8,7 +9,7 @@ export class ExportFile implements ReadableFile {
   private used = 0;
   size = 0;
   constructor(private engine: Engine, private db: number,
-    private decoder: Awaited<ReturnType<typeof createDecoder>>, private budget: number) {}
+    private decoder: Decoder, private budget: number) {}
 
   private remember(key: string, value: Uint8Array) {
     if (value.length > this.budget) return;

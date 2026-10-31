@@ -25,6 +25,8 @@ try {
   await npm(['install', '--prefer-offline', '--ignore-scripts', '--no-audit', '--no-fund', join(consumer, packed.filename)], consumer);
   await writeFile(join(consumer, 'consumer.mts'), `
 import { openUrl, type Database, type Value } from 'bono-export';
+import { openUrl as openCloudflare } from 'bono-export/cloudflare';
+const workerOpener: typeof openUrl = openCloudflare;
 const db: Database = await openUrl('http://example.test/db');
 const values: Value[] = [null, 1n, new Uint8Array()];
 await db.query('SELECT ?', values);
@@ -44,6 +46,10 @@ console.log('Installed package loaded both WASM engines and queried a real Rust 
   console.log((await run(process.execPath, ['consumer.mjs', server.url], consumer)).trim());
   // Verify package metadata is usable independently of the repository.
   await readFile(join(consumer, 'node_modules/bono-export/dist/index.d.ts'));
+  if (process.argv.includes('--cloudflare')) {
+    const { smokeCloudflare } = await import('./cloudflare-smoke.mjs');
+    await smokeCloudflare(consumer);
+  }
 } finally {
   await server?.close();
   if (dirname(resolve(consumer)) !== tempRoot) throw new Error('Unexpected temporary consumer path');

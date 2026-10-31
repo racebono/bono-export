@@ -1,5 +1,5 @@
 import * as S from 'wa-sqlite';
-import type { Engine } from './engines.js';
+import type { Engine } from './engine-common.js';
 
 export type Value = null | string | number | bigint | Uint8Array;
 export type Row = Record<string, Value>;

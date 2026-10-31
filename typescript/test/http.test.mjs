@@ -100,3 +100,14 @@ test('validates URL and options without exposing invalid URLs', async () => {
   await assert.rejects(RemoteFile.open('http://test/db', { timeoutMs: Infinity }), /timeoutMs/);
   await assert.rejects(RemoteFile.open('http://test/db', { cacheBytes: 1 }), /cacheBytes/);
 });
+
+test('invokes native-style fetch with the global receiver', async () => {
+  const transport = rangeTransport(data);
+  const file = await RemoteFile.open('http://test/db', {
+    fetch: function (...args) {
+      assert.equal(this, globalThis);
+      return transport.fetch(...args);
+    },
+  });
+  file.close();
+});

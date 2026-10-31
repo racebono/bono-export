@@ -1,8 +1,10 @@
 # Third-party components
 
 This package uses the following npm dependencies, pinned in package-lock.json.
-Their JavaScript and WebAssembly assets are installed by npm rather than copied
-into this package. Their upstream license terms continue to apply.
+Their upstream license terms continue to apply. The Cloudflare distribution copies
+wa-sqlite's `dist/wa-sqlite-async.wasm` and zstd-wasm's `dist/common/zstd.wasm` and
+unmodified `dist/web/zstd.js` into `dist/vendor/` at build time. Node uses the installed
+dependencies directly. The copy source versions are pinned in package-lock.json.
 
 ## wa-sqlite 1.0.0
 

@@ -1,7 +1,8 @@
 # bono-export for TypeScript
 
 Read a compressed bono SQLite export directly from an HTTP(S) server in Node.js
-22 or newer. Queries download only the portions they read, using HTTP byte ranges.
+22 or newer, or in Cloudflare Workers / Durable Objects through
+[`bono-export/cloudflare`](CLOUDFLARE.md). Queries download only the portions they read, using HTTP byte ranges.
 SQLite and dictionary-capable Zstandard run in WebAssembly; consumers need no Rust,
 C++ compiler, native addon, or separately downloaded WASM assets.
 
@@ -55,6 +56,7 @@ const db = await openUrl(url, {
   timeoutMs: 60_000,
   cacheBytes: 64 * 1024 * 1024,
   decodedCacheBytes: 32 * 1024 * 1024,
+  sqliteCacheKiB: 32 * 1024,
   fetch: globalThis.fetch,
 });
 ```
@@ -62,6 +64,7 @@ const db = await openUrl(url, {
 - `timeoutMs`: positive integer, at most 2147483647; covers headers and body of each attempt.
 - `cacheBytes`: HTTP cache budget, at least 65536 bytes, rounded down to whole 64 KiB chunks.
 - `decodedCacheBytes`: shared decoded-page/dictionary cache budget, at least 8192 bytes.
+- `sqliteCacheKiB`: page cache budget for each SQLite instance, from 8 to 2147483647 KiB.
 - `fetch`: optional Fetch-compatible transport, for custom authentication or testing.
 
 The server must return `206 Partial Content` with a valid `Content-Range`, and
@@ -92,6 +95,7 @@ Use a Node worker thread if you need CPU isolation.
 npm ci
 npm test
 npm run test:package
+npm run test:cloudflare
 ```
 
 The package smoke test installs the tarball into a temporary consumer outside the
@@ -101,6 +105,8 @@ dependency metadata, so it needs the same registry access as a normal npm instal
 
 See [fixture provenance and regeneration](test/fixtures/README.md).
 The Node asset loader is isolated in `src/engines.ts`; the HTTP and VFS layers use
-Web APIs. Browser loading and browser testing are future work.
+Web APIs. The Cloudflare adapter uses bundled compiled modules and smaller defaults;
+see [Workers and Durable Objects usage](CLOUDFLARE.md). General browser loading and
+browser testing are future work.
 
 MIT; see [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
