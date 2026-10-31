@@ -96,7 +96,8 @@ npm run test:package
 
 The package smoke test installs the tarball into a temporary consumer outside the
 repository, checks TypeScript imports, and runs a query over HTTP with the installed
-WASM assets. It uses npm's offline cache populated by `npm ci`.
+WASM assets. It reuses npm's cache when possible and may access the registry for
+dependency metadata, so it needs the same registry access as a normal npm install.
 
 See [fixture provenance and regeneration](test/fixtures/README.md).
 The Node asset loader is isolated in `src/engines.ts`; the HTTP and VFS layers use

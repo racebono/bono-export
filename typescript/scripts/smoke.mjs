@@ -22,7 +22,7 @@ try {
   const [packed] = JSON.parse(await npm(['pack', '--ignore-scripts', '--json', '--pack-destination', consumer], root));
   if (packed.files.some(file => /test\/|scripts\/|node_modules\//.test(file.path))) throw new Error('Unexpected package contents');
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
-  await npm(['install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund', join(consumer, packed.filename)], consumer);
+  await npm(['install', '--prefer-offline', '--ignore-scripts', '--no-audit', '--no-fund', join(consumer, packed.filename)], consumer);
   await writeFile(join(consumer, 'consumer.mts'), `
 import { openUrl, type Database, type Value } from 'bono-export';
 const db: Database = await openUrl('http://example.test/db');
