@@ -1,0 +1,50 @@
+{
+  "name": "bono-export",
+  "version": "0.1.0",
+  "description": "Read bono SQLite exports over HTTP using TypeScript and WebAssembly",
+  "type": "module",
+  "license": "MIT",
+  "repository": "github:racebono/bono-export",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cloudflare": {
+      "types": "./dist/cloudflare.d.ts",
+      "import": "./dist/cloudflare.js"
+    }
+  },
+  "files": [
+    "dist",
+    "CLOUDFLARE.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "scripts": {
+    "build": "tsc && node scripts/assets.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "test:package": "npm run build && node scripts/smoke.mjs",
+    "test:cloudflare": "npm run build && node scripts/smoke.mjs --cloudflare",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@bokuweb/zstd-wasm": "0.0.27",
+    "wa-sqlite": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "0.28.2",
+    "miniflare": "4.20260730.0",
+    "typescript": "~5.9.3"
+  },
+  "overrides": {
+    "miniflare": {
+      "undici": "^7.30.1",
+      "sharp": "0.35.5"
+    }
+  }
+}
