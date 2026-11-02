@@ -6,6 +6,14 @@ Exports a SQLite database into one small, read-only copy, its pages compressed w
 
 Made for the telemetry recordings of [bono](https://github.com/racebono/bono).
 
+## TypeScript / Node.js
+
+The [TypeScript library](typescript/README.md) opens exports over HTTP(S) with
+`await openUrl(url)` and runs read-only SQL using SQLite and zstd WebAssembly.
+It fetches only the portions queries read and supports Node.js 22+ without native addons.
+Use [`bono-export/cloudflare`](typescript/CLOUDFLARE.md) in Cloudflare Workers and
+Durable Objects; it bundles WASM modules and uses smaller cache defaults.
+
 ## Building
 
 Needs a C++14 compiler. The benchmark also builds `bono-sim` from bono, whose bindings need
